@@ -65,21 +65,20 @@ export const executors: ProviderExecutors = defineOAuthProviderExecutors(service
 
 export const credentialValidators: CredentialValidators = {
   async oauth2(input, { fetcher }) {
-    const profile = await googleJsonRequest<{
-      email?: string;
-      name?: string;
-      sub?: string;
-    }>("https://www.googleapis.com/oauth2/v3/userinfo", {
+    const payload = await googleJsonRequest<{ accountSummaries?: unknown }>(
+      `${googleAnalyticsAdminApiBaseUrl}/accountSummaries?pageSize=1`,
+      {
       accessToken: input.accessToken,
       fetcher,
-    });
+      },
+    );
     return {
       profile: {
-        accountId: profile.email ?? profile.sub ?? "google_analytics:oauth2",
-        displayName: profile.name ?? profile.email ?? "Google Analytics User",
+        accountId: "google_analytics:oauth2",
+        displayName: "Google Analytics",
       },
       metadata: {
-        currentAccount: profile,
+        hasAccessibleAccount: Array.isArray(payload.accountSummaries) && payload.accountSummaries.length > 0,
       },
     };
   },

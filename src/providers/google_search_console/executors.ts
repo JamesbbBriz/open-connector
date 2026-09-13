@@ -77,21 +77,17 @@ export const executors: ProviderExecutors = defineOAuthProviderExecutors(service
 
 export const credentialValidators: CredentialValidators = {
   async oauth2(input, { fetcher }) {
-    const profile = await googleJsonRequest<{
-      email?: string;
-      name?: string;
-      sub?: string;
-    }>("https://www.googleapis.com/oauth2/v3/userinfo", {
+    const payload = await googleJsonRequest<SitesPayload>(`${searchConsoleApiBaseUrl}/sites`, {
       accessToken: input.accessToken,
       fetcher,
     });
     return {
       profile: {
-        accountId: profile.email ?? profile.sub ?? "google_search_console:oauth2",
-        displayName: profile.name ?? profile.email ?? "Google Search Console User",
+        accountId: "google_search_console:oauth2",
+        displayName: "Google Search Console",
       },
       metadata: {
-        currentAccount: profile,
+        siteCount: Array.isArray(payload.siteEntry) ? payload.siteEntry.length : 0,
       },
     };
   },

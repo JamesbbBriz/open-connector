@@ -20,6 +20,7 @@ export const provider: ProviderDefinition = {
       tokenUrl: "https://oauth2.googleapis.com/token",
       scopes: googleSearchConsoleOAuthScopes,
       tokenEndpointAuthMethod: "client_secret_post",
+      pkce: { method: "S256" },
       authorizationParams: {
         access_type: "offline",
         prompt: "consent",
